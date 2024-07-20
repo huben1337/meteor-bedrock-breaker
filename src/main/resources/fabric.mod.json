@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "meteor-bedrock-breaker",
+  "version": "${version}",
+  "name": "Meteor Bedrock Breaker",
+  "description": "Helps you break bedrock.",
+  "authors": [
+    "huben_1337"
+  ],
+  "contact": {
+    "repo": "https://github.com/huben1337/meteor-bedrock-breaker"
+  },
+  "icon": "assets/template/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "meteor": [
+      "com.huben.addon.Addon"
+    ]
+  },
+  "mixins": [
+    "meteor-bedrock-breaker.mixins.json"
+  ],
+  "custom": {
+    "meteor-client:color": "225,25,25"
+  },
+  "depends": {
+    "java": ">=17",
+    "minecraft": ">=${mc_version}",
+    "meteor-client": "*"
+  }
+}
