@@ -20,6 +20,6 @@ jobs:
           repo_token: '${{ secrets.GITHUB_TOKEN }}'
           automatic_release_tag: latest
           prerelease: true
-          title: Dev Build
+          title: Dev Build fr
           files: |
             ./build/libs/*.jar
