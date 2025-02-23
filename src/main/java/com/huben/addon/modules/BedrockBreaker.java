@@ -43,6 +43,7 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class BedrockBreaker extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -66,24 +67,24 @@ public class BedrockBreaker extends Module {
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-            .name("side-color")
-            .description("The side color of the bounding box.")
-            .defaultValue(new SettingColor(16,106,144, 100))
-            .build()
+        .name("side-color")
+        .description("The side color of the bounding box.")
+        .defaultValue(new SettingColor(16,106,144, 100))
+        .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-            .name("line-color")
-            .description("The line color of the bounding box.")
-            .defaultValue(new SettingColor(16,106,144, 255))
-            .build()
+        .name("line-color")
+        .description("The line color of the bounding box.")
+        .defaultValue(new SettingColor(16,106,144, 255))
+        .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-            .name("box-mode")
-            .description("How the shape for the bounding box is rendered.")
-            .defaultValue(ShapeMode.Both)
-            .build()
+        .name("box-mode")
+        .description("How the shape for the bounding box is rendered.")
+        .defaultValue(ShapeMode.Both)
+        .build()
     );
 
     public BedrockBreaker() {
@@ -96,7 +97,7 @@ public class BedrockBreaker extends Module {
             info("Dumbass. You dont need this module in creative mode.");
             return;
         } */
-        
+
         info("Waiting for user input...");
     }
 
@@ -119,6 +120,7 @@ public class BedrockBreaker extends Module {
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         cancelRotations = false;
+        assert mc.player != null;
         direction = Math.floorMod(Math.round((mc.player.getRotationClient().y % 360) / 90), 4);
 
         double pX = mc.player.getX();
@@ -178,7 +180,7 @@ public class BedrockBreaker extends Module {
                 info("Failed to replace blocks. Waiting for user input...");
             }
             currentState = State.DONE;
-            
+
         } else if (currentState == State.DONE) {
             timer++;
             if (timer >= 2) {
@@ -248,25 +250,26 @@ public class BedrockBreaker extends Module {
 
         for (int i = 0; i < width; i++) {
             BlockPos pistonBlockPos = null;
-            BlockPos torchBlockPos = null;
-            switch (direction) {
-                case 0:
+            BlockPos torchBlockPos = switch (direction) {
+                case 0 -> {
                     pistonBlockPos = start.add(i, 0, 0);
-                    torchBlockPos = start.add(i, 0, -1);
-                    break;
-                case 1:
+                    yield start.add(i, 0, -1);
+                }
+                case 1 -> {
                     pistonBlockPos = start.add(0, 0, i);
-                    torchBlockPos = start.add(1, 0, i);
-                    break;
-                case 2:
+                    yield start.add(1, 0, i);
+                }
+                case 2 -> {
                     pistonBlockPos = start.add(i, 0, 0);
-                    torchBlockPos = start.add(i, 0, 1);
-                    break;
-                case 3:
+                    yield start.add(i, 0, 1);
+                }
+                case 3 -> {
                     pistonBlockPos = start.add(0, 0, i);
-                    torchBlockPos = start.add(-1, 0, i);
-                    break;
-            }
+                    yield start.add(-1, 0, i);
+                }
+                default -> null;
+            };
+
             if (pistonBlockPos == null
                 || torchBlockPos == null
                 || !BlockUtils.canPlaceBlock(pistonBlockPos, false, Blocks.PISTON)
@@ -280,7 +283,7 @@ public class BedrockBreaker extends Module {
             torchPositions[i] = torchBlockPos;
         }
 
-        mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), 90, mc.player.isOnGround()));
+        Objects.requireNonNull(mc.getNetworkHandler()).sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), 90, mc.player.isOnGround(),         mc.player.forwardSpeed != 0 || mc.player.sidewaysSpeed != 0));
 
         cancelRotations = true;
 
@@ -289,16 +292,19 @@ public class BedrockBreaker extends Module {
         mc.player.getInventory().selectedSlot = pistonSlot;
         for (BlockPos pistonBlockPos : pistonPositions) {
             BlockHitResult pistonBhr = new BlockHitResult(Vec3d.ofCenter(pistonBlockPos, 0), Direction.UP, pistonBlockPos, false);
+            assert mc.interactionManager != null;
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, pistonBhr);
         }
 
         mc.player.getInventory().selectedSlot = torchSlot;
         for (BlockPos torchBlockPos : torchPositions) {
             BlockHitResult torchBhr = new BlockHitResult(Vec3d.ofCenter(torchBlockPos, 0), Direction.UP, torchBlockPos, false);
+            assert mc.interactionManager != null;
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, torchBhr);
         }
-        
+
         mc.player.getInventory().selectedSlot = previousSlot;
+        assert mc.interactionManager != null;
         ((IClientPlayerInteractionManager) mc.interactionManager).meteor$syncSelected();
 
         return true;
@@ -308,6 +314,7 @@ public class BedrockBreaker extends Module {
         if (torchPositions == null || pistonPositions == null) return false;
         boolean done = true;
         for (BlockPos torchBlockPos : torchPositions) {
+            assert mc.world != null;
             if (!mc.world.getBlockState(torchBlockPos).isAir()) {
                 done = false;
                 BlockUtils.breakBlock(torchBlockPos, true);
@@ -315,6 +322,7 @@ public class BedrockBreaker extends Module {
 
         }
         for (BlockPos pistonBlockPos : pistonPositions) {
+            assert mc.world != null;
             if (!mc.world.getBlockState(pistonBlockPos).isAir()) {
                 BlockUtils.breakBlock(pistonBlockPos, true);
                 return false;
@@ -329,6 +337,7 @@ public class BedrockBreaker extends Module {
         int pistonSlot = -1;
         int pistonCount = 0;
         for (int i = 0; i < 9; i++) {
+            assert mc.player != null;
             ItemStack stack = mc.player.getInventory().getStack(i);
             if (stack.isOf(Items.PISTON)) {
                 if (pistonSlot == -1) pistonSlot = i;
@@ -341,19 +350,21 @@ public class BedrockBreaker extends Module {
 
         mc.player.getInventory().selectedSlot = pistonSlot;
 
-        
 
-        mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), -89, mc.player.isOnGround()));
+
+        Objects.requireNonNull(mc.getNetworkHandler()).sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), -89, mc.player.isOnGround(), mc.player.forwardSpeed != 0 || mc.player.sidewaysSpeed != 0));
 
         cancelRotations = true;
 
         for (BlockPos pistonBlockPos : pistonPositions) {
             if (!BlockUtils.canPlaceBlock(pistonBlockPos, false, Blocks.PISTON)) return false;
             BlockHitResult pistonBhr = new BlockHitResult(Vec3d.ofCenter(pistonBlockPos), Direction.DOWN, pistonBlockPos, false);
+            assert mc.interactionManager != null;
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, pistonBhr);
         }
 
         mc.player.getInventory().selectedSlot = previousSlot;
+        assert mc.interactionManager != null;
         ((IClientPlayerInteractionManager) mc.interactionManager).meteor$syncSelected();
 
         return true;
@@ -419,7 +430,7 @@ public class BedrockBreaker extends Module {
 
     private void releasePackets() {
         for (Packet<?> packet : delayedPackets) {
-            mc.getNetworkHandler().sendPacket(packet);
+            Objects.requireNonNull(mc.getNetworkHandler()).sendPacket(packet);
         }
         delayedPackets.clear();
     }
