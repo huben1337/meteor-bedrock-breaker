@@ -1,6 +1,7 @@
 package com.huben.addon.modules;
 
 import com.huben.addon.Addon;
+import com.huben.mixin.FireworkRocketEntityAccessor;
 import com.huben.util.MyFireworkRocketEntity;
 
 import meteordevelopment.meteorclient.events.Cancellable;
@@ -130,12 +131,18 @@ public class ElytraBoostPlus extends Module  {
         return mc.player.getStackInHand(hand).getItem() instanceof FireworkRocketItem;
     }
 
+    MyFireworkRocketEntity currentRocket = null;
+
     private void boostClient() {
         if (!Utils.canUpdate()) return;
+        if (currentRocket != null && currentRocket.isAlive()) {
+            ((FireworkRocketEntityAccessor) currentRocket).setLife(0);
+            return;
+        }
         if (mc.player.isGliding()) {
-            MyFireworkRocketEntity entity = MyFireworkRocketEntity.create(fireworkLevel.get());
-            if (playSound.get()) mc.world.playSoundFromEntity(mc.player, entity, SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, soundChannel.get(), 3.0F, 1.0F);
-            mc.world.addEntity(entity);
+            currentRocket = MyFireworkRocketEntity.create(fireworkLevel.get());
+            if (playSound.get()) mc.world.playSoundFromEntity(mc.player, currentRocket, SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, soundChannel.get(), 3.0F, 1.0F);
+            mc.world.addEntity(currentRocket);
         }
     }
 }
