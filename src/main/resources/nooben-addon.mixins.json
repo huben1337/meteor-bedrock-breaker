@@ -1,0 +1,26 @@
+{
+  "required": true,
+  "package": "com.huben.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ClientConnectionMixin",
+    "ClientPlayerInteractionManagerMixin",
+    "ClientWorldMixin",
+    "PendingUpdateManagerMixin",
+    "PlayerMoveC2SPacketMixin",
+    "PlayerMoveC2SPacketMixin$Full",
+    "PlayerMoveC2SPacketMixin$LookAndOnGround",
+    "WorldMixin",
+    "WorldAccessor",
+    "InactivityFpsLimiterMixin",
+    "InactivityFpsLimiterAccessor",
+    "SpriteAtlasHolderAccessor",
+    "SpriteAtlasTextureAccessor",
+    "FireworkRocketEntityAccessor",
+    "MinecraftClientMixin"
+	],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

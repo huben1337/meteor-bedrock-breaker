@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "id": "meteor-bedrock-breaker",
+  "id": "nooben-addon",
   "version": "${version}",
-  "name": "Meteor Bedrock Breaker",
-  "description": "Helps you break bedrock.",
+  "name": "Nooben Addon",
+  "description": "Nooben Addon",
   "authors": [
     "huben_1337"
   ],
   "contact": {
     "repo": "https://github.com/huben1337/meteor-bedrock-breaker"
   },
-  "icon": "assets/template/icon.png",
+  "icon": "assets/icon.png",
   "environment": "client",
   "entrypoints": {
     "meteor": [
@@ -18,7 +18,7 @@
     ]
   },
   "mixins": [
-    "meteor-bedrock-breaker.mixins.json"
+    "nooben-addon.mixins.json"
   ],
   "custom": {
     "meteor-client:color": "225,25,25"
