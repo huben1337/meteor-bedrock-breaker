@@ -135,11 +135,11 @@ public class ElytraBoostPlus extends Module  {
 
     private void boostClient() {
         if (!Utils.canUpdate()) return;
-        if (currentRocket != null && currentRocket.isAlive()) {
-            ((FireworkRocketEntityAccessor) currentRocket).setLife(0);
-            return;
-        }
         if (mc.player.isGliding()) {
+            if (currentRocket != null && currentRocket.isAlive()) {
+                ((FireworkRocketEntityAccessor) currentRocket).setLife(0);
+                return;
+            }
             currentRocket = MyFireworkRocketEntity.create(fireworkLevel.get());
             if (playSound.get()) mc.world.playSoundFromEntity(mc.player, currentRocket, SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, soundChannel.get(), 3.0F, 1.0F);
             mc.world.addEntity(currentRocket);
