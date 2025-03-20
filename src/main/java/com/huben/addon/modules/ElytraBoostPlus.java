@@ -1,6 +1,7 @@
 package com.huben.addon.modules;
 
 import com.huben.addon.Addon;
+import com.huben.addon.events.world.JoinWorldEvent;
 import com.huben.mixin.FireworkRocketEntityAccessor;
 import com.huben.util.MyFireworkRocketEntity;
 
@@ -84,8 +85,12 @@ public class ElytraBoostPlus extends Module  {
 
     @Override
     public void toggle() {
-        if (!isActive() && meteorElytraBoost != null && meteorElytraBoost.isActive()) {
-            meteorElytraBoost.toggle();
+        if (isActive()) {
+            currentRocket = null;
+        } else {
+            if (meteorElytraBoost != null && meteorElytraBoost.isActive()) {
+                meteorElytraBoost.toggle();
+            }
         }
         super.toggle();
     }
@@ -95,6 +100,11 @@ public class ElytraBoostPlus extends Module  {
         if (meteorElytraBoost != null && meteorElytraBoost.isActive()) {
             toggle();
         }
+    }
+
+    @EventHandler
+    private void onJoinWorld(JoinWorldEvent event) {
+        currentRocket = null;
     }
 
     @EventHandler

@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.huben.addon.events.world.JoinWorldEvent;
 import com.huben.addon.events.world.WeatherEvent;
 
 import meteordevelopment.meteorclient.MeteorClient;
@@ -20,6 +21,7 @@ import net.minecraft.world.World;
 public class MinecraftClientMixin {
     @Inject(method = "joinWorld", at = @At("HEAD"))
     void joinWorld(ClientWorld world, DownloadingTerrainScreen.WorldEntryReason worldEntryReason, CallbackInfo ci) {
+        MeteorClient.EVENT_BUS.post(JoinWorldEvent.get());
         if (world.getRegistryKey() == World.OVERWORLD){
             RainGradientBugfixHelper.rainGradientDelta = 0.0f;
             RainGradientBugfixHelper.encounteredBug = false;
