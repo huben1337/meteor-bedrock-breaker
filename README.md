@@ -3,5 +3,5 @@
 - Bedrock Breaker
 - Weather Pinger
 - Weather HUD
-- Elyrta Boost Plus
+- Elytra Boost Plus
 - Server Rotations
